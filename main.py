@@ -74,8 +74,16 @@ def main() -> None:
   with serial.Serial(serial_config["port"], serial_config["baud_rate"], timeout=serial_config["timeout"]) as ser:
     while True:
       line = ser.readline()
-      logging.info(line.decode('utf-8'))
-      print(line.decode('utf-8'))
+      line_decoded = None
+      # BUG FIX - /python-serial-logger/main.py", line 77, in main
+      # logging.info(line.decode('utf-8'))
+      try:
+        line_decoded_as_utf8 = line.decode('utf-8')
+        logging.info(line_decoded_as_utf8)
+        print(line_decoded_as_utf8)
+      except UnicodeDecodeError:
+        logging.error("ERROR: error decoding utf-8")
+        logging.error(line)
       time.sleep(1)
 
 
