@@ -11,6 +11,7 @@ ERROR_INVALID_PORT = "ERROR: Invalid port ... exiting"
 def handle_args():
   parser = argparse.ArgumentParser()
 
+  parser.add_argument("-l", "--list",action='store', help="List available serial ports and exit", dest='list', default=None, nargs='?')
   required_args = parser.add_argument_group("required named arguments")
   
   # Required named arguments
@@ -35,11 +36,17 @@ def main() -> None:
   log_file_name = f"serial-logger-{datetime.now().strftime('%Y-%m-%d')}.log"
   logging.basicConfig(filename=log_file_name, encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S %z')
 
-  print("Serial logger")
-  print(log_file_name)
+  print("Python Serial Logger")
+  print("Logging to " + log_file_name)
 
   args = handle_args()
 
+  if '-l' in sys.argv:
+    serial_ports = list_serial_ports()
+    for port, desc, hwid in sorted(serial_ports):
+      print(f"{port}: {desc} {hwid}")
+    sys.exit(0)
+  
   if args.port:
     serial_config["port"] = args.port
   else:
